@@ -11,9 +11,12 @@ int main(int argc, char* argv[])
 	SDL_Surface *display = NULL;
 	SDL_Event event;
 	SDL_Rect box;
+	SDL_Rect boundaries;
+	unsigned speed;
 	unsigned color;
 	unsigned bkg_color;
 	bool running;
+	unsigned char *keys;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 	{
@@ -39,13 +42,16 @@ int main(int argc, char* argv[])
 	box.x = (W_W - B_W) / 2;
 	box.y = (W_H - B_H) / 2;
 
+	boundaries.x = 0;
+	boundaries.y = 0;
+	boundaries.w = W_W - box.w;
+	boundaries.h = W_H - box.h;
+
+	speed = 6;
+
 	bkg_color = SDL_MapRGB(display->format, 0, 0, 0);
 	color = SDL_MapRGB(display->format, 0, 0, 255);
 	running = true;
-
-	SDL_FillRect(display, NULL, bkg_color);
-	SDL_FillRect(display, &box, color);
-	SDL_Flip(display);
 
 	while (running)
 	{
@@ -63,6 +69,38 @@ int main(int argc, char* argv[])
 						break;
 					}
 			}
+		}
+		keys = SDL_GetKeyState(NULL);
+
+		SDL_FillRect(display, NULL, bkg_color);
+		SDL_FillRect(display, &box, color);
+		SDL_Flip(display);
+
+		// y
+		if (keys[SDLK_UP])
+		{
+			box.y -= speed;
+			if (box.y < boundaries.y)
+				box.y = boundaries.y;
+		}
+		else if (keys[SDLK_DOWN])
+		{
+			box.y += speed;
+			if (box.y > boundaries.h)
+				box.y = boundaries.h;
+		}
+		// x
+		if (keys[SDLK_LEFT])
+		{
+			box.x -= speed;
+			if (box.x < boundaries.x)
+				box.x = boundaries.x;
+		}
+		else if (keys[SDLK_RIGHT])
+		{
+			box.x += speed;
+			if (box.x > boundaries.w)
+				box.x = boundaries.w;
 		}
 
 		SDL_Delay(20);
